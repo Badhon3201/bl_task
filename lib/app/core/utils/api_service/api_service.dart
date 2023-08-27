@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bl_task/app/core/utils/api_service/urls.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,7 +13,12 @@ class ApiService {
   Future<http.Response> getRequest(String url) async {
     var completeUrl = url;
     debugPrint("Checking for Get API start & end point $completeUrl");
-    var headers = {'Content-Type': 'application/json'};
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept-Language': 'en',
+      'X-RapidAPI-Key': Urls.key,
+      'X-RapidAPI-Host': 'edamam-recipe-search.p.rapidapi.com'
+    };
     return httClient!.get(Uri.parse(completeUrl), headers: headers);
   }
 

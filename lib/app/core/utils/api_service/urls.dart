@@ -1,4 +1,4 @@
 class Urls {
-  static var key = "64e45c93c555638029131290";
-  static var taskUrl = "https://$key.mockapi.io/btl-task/tasks";
+  static var key = "efef3499d8msh9707f62b55b1719p16aa12jsn8e3a74f7b770";
+  static var productUrl = "https://edamam-recipe-search.p.rapidapi.com/api/recipes/v2";
 }

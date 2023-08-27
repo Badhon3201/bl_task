@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/reponsive_ui_service.dart';
-import '../../home/views/widgets/search_field_widget.dart';
+import 'widgets/search_field_widget.dart';
 import '../controllers/product_details_controller.dart';
 import 'widgets/header_button_widget.dart';
 import 'widgets/health_type_list_tile.dart';
@@ -21,7 +21,8 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
   Widget build(BuildContext context) {
     ResponsiveUIService().init(const Size(375, 812), context);
     return DefaultTabController(
-      length: 4,
+      length: controller.productDetails.value!.recipe!.digest!.length,
+      initialIndex: controller.initialTabIndex.value,
       child: Scaffold(
         body: SafeArea(
           child: Stack(
@@ -152,7 +153,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Wok-Fried Duck & Oyster Sauce",
+                "${controller.productDetails.value?.recipe?.label}",
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -166,7 +167,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                 ),
               ),
               Text(
-                "BBC Good Food",
+                controller.productDetails.value?.recipe?.source ?? "",
                 style: GoogleFonts.poppins(
                     fontSize: 10, decoration: TextDecoration.underline),
               ),
@@ -187,7 +188,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15.r),
             child: Image.network(
-              "http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcQ4a4S1-1pcCIAYVXBo4RdOcH_quTfYW0shLrqbqv5JCwiQKN8rB8zbQADwDXCc7qmnxpguWhdTsMr8jPLLpDY",
+              controller.productDetails.value?.recipe?.image ?? "",
               height: 168,
               width: 168,
               fit: BoxFit.cover,
@@ -214,8 +215,12 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               child: ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                itemCount: 3,
-                itemBuilder: (context, index) => const HealthTypeListTile(),
+                itemCount: controller
+                    .productDetails.value?.recipe?.healthLabels?.length,
+                itemBuilder: (context, index) => HealthTypeListTile(
+                    healthLabel: controller.productDetails.value?.recipe
+                            ?.healthLabels?[index] ??
+                        ""),
               )),
         ],
       ),
@@ -238,8 +243,12 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               child: ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                itemCount: 3,
-                itemBuilder: (context, index) => const HealthTypeListTile(),
+                itemCount: controller
+                    .productDetails.value?.recipe?.cuisineType?.length,
+                itemBuilder: (context, index) => HealthTypeListTile(
+                    healthLabel: controller.productDetails.value?.recipe
+                            ?.cuisineType?[index] ??
+                        ""),
               )),
         ],
       ),
@@ -261,8 +270,11 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             height: 92.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (context, index) => const IngredientsListTile(),
+              itemCount:
+                  controller.productDetails.value?.recipe?.ingredients?.length,
+              itemBuilder: (context, index) => IngredientsListTile(
+                  ingredient: controller
+                      .productDetails.value!.recipe!.ingredients![index]),
             ),
           )
         ],
@@ -330,13 +342,13 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                   width: 1,
                   decoration: const BoxDecoration(color: Colors.black),
                 ),
-                Expanded(child: nutritionDetails("CAL / SERV", "7")),
+                Expanded(child: nutritionDetails("Daily Value", "7%")),
                 Container(
                   height: 45,
                   width: 1,
                   decoration: const BoxDecoration(color: Colors.black),
                 ),
-                Expanded(child: nutritionDetails("CAL / SERV", "8")),
+                Expanded(child: nutritionDetails("SERVINGS", "8")),
               ],
             ),
           )
@@ -382,12 +394,17 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             StringResources.tags,
             style: TextStyles.titleStyle,
           ),
-          Text(
-            "Low-Carb, Dairy-Free, Egg-Free, Peanut-Free, Tree-Nut-Free, Soy-Free, Fish-Free",
-            style: GoogleFonts.poppins(
-              color: ColorManager.grayColor,
-              decoration: TextDecoration.underline,
-            ),
+          Wrap(
+            children: [
+              for (var item in controller.tagsList)
+                Text(
+                  "$item , ",
+                  style: GoogleFonts.poppins(
+                    color: ColorManager.grayColor,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+            ],
           )
         ],
       ),
@@ -408,27 +425,74 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           CommonSpace.sizedBoxH,
           Container(
             height: 45.h,
-            decoration:
-                BoxDecoration(borderRadius: BorderRadius.circular(25.0)),
-            child: TabBar(
-              indicator: BoxDecoration(
-                  color: ColorManager.greenColor,
-                  borderRadius: BorderRadius.circular(25.0)),
-              labelColor: ColorManager.blackColor,
-              unselectedLabelColor: ColorManager.grayColor,
-              tabs: const [
-                Tab(
-                  text: 'Fat',
+            width: Get.width,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25.0),
+                color: ColorManager.greenColor,
+                //color: Colors.red,
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 3,
+                      color: ColorManager.grayColor.withOpacity(0.2),
+                      spreadRadius: 0,
+                      offset: const Offset(0, 1))
+                ]),
+            child: Row(
+              children: [
+                Obx(() => controller.initialTabIndex.value == 0
+                    ? const SizedBox()
+                    : InkWell(
+                        onTap: () {
+                          controller.tabController.previousIndex;
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                        ),
+                      )),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25.0),
+                      color: ColorManager.whiteColor,
+                      //color: Colors.red,
+                    ),
+                    child: TabBar(
+                        controller: controller.tabController,
+                        isScrollable: true,
+                        padding: EdgeInsets.all(8.r),
+                        onTap: (v) {
+                          controller.initialTabIndex.value = v;
+                        },
+                        indicator: BoxDecoration(
+                            color: ColorManager.greenColor,
+                            borderRadius: BorderRadius.circular(25.0)),
+                        labelColor: ColorManager.blackColor,
+                        unselectedLabelColor: ColorManager.grayColor,
+                        tabs: controller.productDetails.value!.recipe!.digest!
+                            .map(
+                              (e) => Tab(
+                                text: e.label,
+                              ),
+                            )
+                            .toList()),
+                  ),
                 ),
-                Tab(
-                  text: 'Carbs',
-                ),
-                Tab(
-                  text: 'Protein',
-                ),
-                Tab(
-                  text: 'Cholesterol',
-                )
+                Obx(() => controller.initialTabIndex.value ==
+                        controller
+                                .productDetails.value!.recipe!.digest!.length -
+                            1
+                    ? const SizedBox()
+                    : InkWell(
+                        onTap: () {
+                          controller.initialTabIndex.value =
+                              controller.tabController.length + 1;
+                        },
+                        child: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.white,
+                        ),
+                      ))
               ],
             ),
           ),
@@ -447,109 +511,114 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               ),
             ),
             child: TabBarView(
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20.0.w, top: 10.h, right: 20.w),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              controller: controller.tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: controller.productDetails.value!.recipe!.digest!
+                  .map(
+                    (e) => Padding(
+                      padding:
+                          EdgeInsets.only(left: 20.0.w, top: 10.h, right: 20.w),
+                      child: Column(
                         children: [
-                          SizedBox(
-                              width: 155.w,
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "Fat",
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Icon(Icons.keyboard_arrow_down_sharp)
-                                ],
-                              )),
-                          SizedBox(
-                              width: 110.w,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                  width: 155.w,
+                                  child: Row(
                                     children: [
                                       Text(
-                                        "7g",
+                                        e.tag ?? "",
                                         style: GoogleFonts.poppins(
-                                            fontSize: 10,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      CommonSpace.sizedBoxW,
-                                      Text(
-                                        "11%",
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                                      const Icon(
+                                          Icons.keyboard_arrow_down_sharp)
                                     ],
+                                  )),
+                              SizedBox(
+                                  width: 110.w,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text(
+                                            "${e.daily?.toStringAsFixed(0)}${e.unit}",
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          CommonSpace.sizedBoxW,
+                                          Text(
+                                            "${e.total?.toStringAsFixed(0)}%",
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(
+                                        color: ColorManager.blackColor,
+                                      )
+                                    ],
+                                  )),
+                            ],
+                          ),
+                          ListView.builder(
+                            itemCount: e.sub!.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              var item = e.sub![index];
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: 155.w,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 35.0.w),
+                                      child: Text(
+                                        item.label ?? "",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  Divider(
-                                    color: ColorManager.blackColor,
-                                  )
+                                  SizedBox(
+                                    width: 110.w,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(
+                                          "${item.daily?.toStringAsFixed(0)}${e.unit}",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        CommonSpace.sizedBoxW,
+                                        Text(
+                                          "${item.total?.toStringAsFixed(0)}%%",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
-                              )),
+                              );
+                            },
+                          )
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 155.w,
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 35.0.w),
-                              child: Text(
-                                "Cholesterol",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 110.w,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Text(
-                                  "7g",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                CommonSpace.sizedBoxW,
-                                Text(
-                                  "11%",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Text("Status Pages"),
-                ),
-                Center(
-                  child: Text('Calls Page'),
-                ),
-                Center(
-                  child: Text('Settings Page'),
-                )
-              ],
+                    ),
+                  )
+                  .toList(),
             ),
           ),
           CommonSpace.sizedBoxH,

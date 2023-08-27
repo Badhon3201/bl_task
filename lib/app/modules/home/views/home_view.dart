@@ -16,7 +16,13 @@ class HomeView extends GetView<HomeController> {
     ResponsiveUIService().init(const Size(375, 812), context);
     return Scaffold(
       appBar: appBar(),
-      body: bodySection(),
+      body: Obx(() {
+        return controller.isLoading.value
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : bodySection();
+      }),
     );
   }
 
@@ -35,18 +41,27 @@ class HomeView extends GetView<HomeController> {
             controller: controller.searchController,
             hintText: 'Search',
             hintStyle: TextStyles.mHintStyle,
+            onChanged: (v){
+              controller.getProduct();
+            },
             trailing: [
-              Container(
-                height: 20.r,
-                width: 20.r,
-                decoration: BoxDecoration(
-                  color: ColorManager.grayColor,
-                  borderRadius: BorderRadius.circular(25.r),
-                ),
-                child: Icon(
-                  Icons.clear,
-                  size: 18.r,
-                  color: ColorManager.whiteColor,
+              InkWell(
+                onTap: (){
+                  controller.searchController.clear();
+                  controller.getProduct();
+                },
+                child: Container(
+                  height: 20.r,
+                  width: 20.r,
+                  decoration: BoxDecoration(
+                    color: ColorManager.grayColor,
+                    borderRadius: BorderRadius.circular(25.r),
+                  ),
+                  child: Icon(
+                    Icons.clear,
+                    size: 18.r,
+                    color: ColorManager.whiteColor,
+                  ),
                 ),
               )
             ],
@@ -95,9 +110,10 @@ class HomeView extends GetView<HomeController> {
                 crossAxisCount: 2,
                 mainAxisExtent: 180.h,
               ),
-              itemCount: 8,
+              itemCount: controller.productListResponse.value?.hits?.length,
               itemBuilder: (BuildContext context, int index) {
-                return const ProductCardWidget();
+                var item = controller.productListResponse.value?.hits?[index];
+                return ProductCardWidget(item: item);
               }),
         ),
       ],

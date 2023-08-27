@@ -1,11 +1,11 @@
+import 'package:bl_task/app/modules/home/repositories/product_repository.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-
-import 'app/core/utils/reponsive_ui_service.dart';
 import 'app/routes/app_pages.dart';
 
 void main() {
+  Get.lazyPut(() => ProductRepository(), fenix: true);
   runApp(
     GetMaterialApp(
       title: "BLTask",

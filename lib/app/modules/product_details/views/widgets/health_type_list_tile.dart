@@ -5,7 +5,8 @@ import '../../../../core/utils/styles.dart';
 import '../../../../core/values/color_manager.dart';
 
 class HealthTypeListTile extends StatelessWidget {
-  const HealthTypeListTile({super.key});
+  const HealthTypeListTile({super.key,required this.healthLabel});
+  final String healthLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class HealthTypeListTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.r)),
       child: Center(
           child: Text(
-            "Mediterranean",
+            healthLabel,
             style: TextStyles.poppinsStyle,
           )),
     );

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/values/color_manager.dart';
+import '../../../../data/models/product_list_response_models.dart';
 
 class IngredientsListTile extends StatelessWidget {
-  const IngredientsListTile({super.key});
+  const IngredientsListTile({super.key,required this.ingredient});
+  final Ingredient ingredient;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +33,12 @@ class IngredientsListTile extends StatelessWidget {
                   ),
                   color: const Color(0xFFc7f891)),
               child: Center(
-                  child: Text(
-                    "Vegetable oil",
-                    style: GoogleFonts.poppins(fontSize: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      ingredient.text??"",overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(fontSize: 12),
+                    ),
                   )),
             ),
           ),
@@ -52,7 +57,7 @@ class IngredientsListTile extends StatelessWidget {
               ),
               child: Center(
                   child: Text(
-                    "2.0 tbsp",
+                    "${ingredient.weight?.toStringAsFixed(2)}",
                     style: GoogleFonts.poppins(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,

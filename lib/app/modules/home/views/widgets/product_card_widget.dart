@@ -5,15 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/utils/styles.dart';
 import '../../../../core/values/color_manager.dart';
+import '../../../../data/models/product_list_response_models.dart';
+import 'image_widget.dart';
 
 class ProductCardWidget extends StatelessWidget {
-  const ProductCardWidget({super.key});
+  const ProductCardWidget({super.key, required this.item});
+
+  final Hit? item;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.toNamed(Routes.PRODUCT_DETAILS);
+        Get.toNamed(Routes.PRODUCT_DETAILS, arguments: {"itemDetails": item});
       },
       child: Container(
         padding: const EdgeInsets.all(5),
@@ -33,18 +37,12 @@ class ProductCardWidget extends StatelessWidget {
               height: 138.h,
               child: Stack(
                 children: [
-                  Image.network(
-                    "http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcQ4a4S1-1pcCIAYVXBo4RdOcH_quTfYW0shLrqbqv5JCwiQKN8rB8zbQADwDXCc7qmnxpguWhdTsMr8jPLLpDY",
-                    fit: BoxFit.fill,
-                    height: 180.h,
-                    color: Colors.grey.withOpacity(1),
-                    colorBlendMode: BlendMode.modulate,
-                  ),
+                  ImageWidget(image: item?.recipe?.image ?? ""),
                   Positioned(
                     top: 5.w,
                     left: 5.h,
                     child: Text(
-                      "Chicken Fried Rice",
+                      item?.recipe?.label ?? "",
                       style: TextStyles.whiteBoldLargeStyle,
                     ),
                   ),
@@ -52,7 +50,7 @@ class ProductCardWidget extends StatelessWidget {
                     left: 5.w,
                     bottom: 5.h,
                     child: Text(
-                      "BBC Good Food",
+                      item?.recipe?.source ?? "",
                       style: TextStyles.whiteBoldLargeStyle,
                     ),
                   ),
@@ -70,7 +68,7 @@ class ProductCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "610",
+                        item?.recipe?.calories?.toStringAsFixed(0)??"",
                         style: TextStyles.greenBoldStyle,
                       ),
                       CommonSpace.sizedBoxW,
@@ -90,7 +88,7 @@ class ProductCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "3",
+                        item?.recipe?.ingredients?.length.toString()??"0",
                         style: TextStyles.greenBoldStyle,
                       ),
                       CommonSpace.sizedBoxW,
