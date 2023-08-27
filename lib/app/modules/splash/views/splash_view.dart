@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../controllers/splash_controller.dart';
 
@@ -9,11 +10,11 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     Get.put(SplashController());
-    return const Scaffold(
+    return  Scaffold(
       body: Center(
         child: Text(
-          'SplashView is working',
-          style: TextStyle(fontSize: 20),
+          'Battery Low Interactive Ltd',
+          style: GoogleFonts.poppins(fontSize: 20),
         ),
       ),
     );

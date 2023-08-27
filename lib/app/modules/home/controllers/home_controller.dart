@@ -35,16 +35,4 @@ class HomeController extends GetxController {
     super.onInit();
     await getProduct();
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

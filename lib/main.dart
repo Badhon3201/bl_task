@@ -8,6 +8,7 @@ void main() {
   Get.lazyPut(() => ProductRepository(), fenix: true);
   runApp(
     GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "BLTask",
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
