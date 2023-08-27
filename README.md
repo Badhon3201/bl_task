@@ -1,16 +1,16 @@
-# untitled3
+# Battery Low Interactive Ltd Task
 
 A new Flutter project.
 
-## Getting Started
+This is product List Screen
+![Screenshot_1693127487](https://github.com/Badhon3201/bl_task/assets/49567193/4dc24eb1-e017-4928-9c4e-2e8fa9551a87)
 
-This project is a starting point for a Flutter application.
+This is product details page
+![Screenshot_1693127508](https://github.com/Badhon3201/bl_task/assets/49567193/d57e78d1-c2e0-4284-8bf8-af0e660fd8ab)
+![Screenshot_1693127499](https://github.com/Badhon3201/bl_task/assets/49567193/8afb1ab5-430f-46da-87ad-5454c06edecc)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Here used getx architecture and state manage used getx.
+For state server request use http package . 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For run this project just clone repository and setup flutter sdk in your device then can run this project. 
